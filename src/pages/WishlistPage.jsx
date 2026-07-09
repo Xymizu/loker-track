@@ -1,6 +1,6 @@
 import WishlistGrid from '../components/WishlistGrid'
 
-export default function WishlistPage({ jobs, onOpen, onMarkApplied }) {
+export default function WishlistPage({ jobs, onOpen, onMarkApplied, applyingId }) {
   const wishlistJobs = jobs.filter((j) => j.status === 'wishlist')
 
   return (
@@ -11,7 +11,12 @@ export default function WishlistPage({ jobs, onOpen, onMarkApplied }) {
           Lowongan yang mau kamu lamar. Tandai "sudah apply" begitu lamaran terkirim.
         </p>
       </div>
-      <WishlistGrid jobs={wishlistJobs} onOpen={onOpen} onMarkApplied={onMarkApplied} />
+      <WishlistGrid
+        jobs={wishlistJobs}
+        onOpen={onOpen}
+        onMarkApplied={onMarkApplied}
+        applyingId={applyingId}
+      />
     </>
   )
 }

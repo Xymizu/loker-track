@@ -1,10 +1,12 @@
+import { NavLink } from 'react-router-dom'
+
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: HomeIcon },
-  { id: 'active', label: 'Lamaran Aktif', icon: BriefcaseIcon },
-  { id: 'wishlist', label: 'Wishlist', icon: BookmarkIcon },
+  { path: '/', key: 'dashboard', label: 'Dashboard', icon: HomeIcon },
+  { path: '/active', key: 'active', label: 'Lamaran Aktif', icon: BriefcaseIcon },
+  { path: '/wishlist', key: 'wishlist', label: 'Wishlist', icon: BookmarkIcon },
 ]
 
-export default function Sidebar({ activeView, onViewChange, jobs }) {
+export default function Sidebar({ jobs }) {
   const activeCount = jobs.filter((j) =>
     ['applied', 'screening', 'interview'].includes(j.status),
   ).length
@@ -25,35 +27,41 @@ export default function Sidebar({ activeView, onViewChange, jobs }) {
           Menu
         </p>
         <ul className="space-y-1">
-          {NAV_ITEMS.map((item) => {
-            const active = activeView === item.id
-            return (
-              <li key={item.id}>
-                <button
-                  onClick={() => onViewChange(item.id)}
-                  className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    active
+          {NAV_ITEMS.map((item) => (
+            <li key={item.key}>
+              <NavLink
+                to={item.path}
+                end={item.path === '/'}
+                className={({ isActive }) =>
+                  `w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    isActive
                       ? 'bg-brand-light text-brand'
                       : 'text-ink-soft hover:bg-surface hover:text-ink'
-                  }`}
-                >
-                  <span className="flex items-center gap-2.5">
-                    <item.icon className={`w-[18px] h-[18px] ${active ? 'text-brand' : 'text-ink-faint'}`} />
-                    {item.label}
-                  </span>
-                  {item.id !== 'dashboard' && counts[item.id] > 0 && (
-                    <span
-                      className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${
-                        active ? 'bg-brand text-white' : 'bg-surface text-ink-soft'
-                      }`}
-                    >
-                      {counts[item.id]}
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span className="flex items-center gap-2.5">
+                      <item.icon
+                        className={`w-[18px] h-[18px] ${isActive ? 'text-brand' : 'text-ink-faint'}`}
+                      />
+                      {item.label}
                     </span>
-                  )}
-                </button>
-              </li>
-            )
-          })}
+                    {item.key !== 'dashboard' && counts[item.key] > 0 && (
+                      <span
+                        className={`text-xs rounded-full px-1.5 py-0.5 font-semibold ${
+                          isActive ? 'bg-brand text-white' : 'bg-surface text-ink-soft'
+                        }`}
+                      >
+                        {counts[item.key]}
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
 

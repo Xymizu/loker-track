@@ -1,53 +1,60 @@
-import { useEffect, useState } from 'react'
-import { SEED_JOBS } from '../data/seedJobs'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '../lib/api'
+import { fromApi, toApi } from '../lib/jobMapper'
 
-const STORAGE_KEY = 'case-file:jobs'
-
-function loadInitial() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch (err) {
-    console.warn('Tidak bisa membaca data tersimpan, memakai contoh data.', err)
-  }
-  return SEED_JOBS
-}
+const JOBS_KEY = ['jobs']
 
 export function useJobs() {
-  const [jobs, setJobs] = useState(loadInitial)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs))
-    } catch (err) {
-      console.warn('Tidak bisa menyimpan data.', err)
-    }
-  }, [jobs])
+  const {
+    data: jobs = [],
+    isLoading: loading,
+    error: queryError,
+    refetch: refresh,
+  } = useQuery({
+    queryKey: JOBS_KEY,
+    queryFn: async () => {
+      const { data } = await api.listJobs()
+      return data.map(fromApi)
+    },
+  })
 
-  function addJob(job) {
-    setJobs((prev) => [
-      { ...job, id: crypto.randomUUID(), updatedAt: new Date().toISOString().slice(0, 10) },
-      ...prev,
-    ])
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: JOBS_KEY })
+
+  const addMutation = useMutation({
+    mutationFn: (job) => api.createJob(toApi(job)),
+    onSuccess: invalidate,
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, patch }) => {
+      const current = jobs.find((j) => j.id === id)
+      const merged = { ...current, ...patch }
+      return api.updateJob(id, toApi(merged))
+    },
+    onSuccess: invalidate,
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => api.deleteJob(id),
+    onSuccess: invalidate,
+  })
+
+  const error =
+    queryError?.message || addMutation.error?.message || updateMutation.error?.message || null
+
+  async function addJob(job) {
+    await addMutation.mutateAsync(job)
   }
 
-  function updateJob(id, patch) {
-    setJobs((prev) =>
-      prev.map((j) =>
-        j.id === id
-          ? { ...j, ...patch, updatedAt: new Date().toISOString().slice(0, 10) }
-          : j,
-      ),
-    )
+  async function updateJob(id, patch) {
+    await updateMutation.mutateAsync({ id, patch })
   }
 
-  function moveJob(id, status) {
-    updateJob(id, { status })
+  async function deleteJob(id) {
+    await deleteMutation.mutateAsync(id)
   }
 
-  function deleteJob(id) {
-    setJobs((prev) => prev.filter((j) => j.id !== id))
-  }
-
-  return { jobs, addJob, updateJob, moveJob, deleteJob }
+  return { jobs, loading, error, addJob, updateJob, deleteJob, refresh }
 }

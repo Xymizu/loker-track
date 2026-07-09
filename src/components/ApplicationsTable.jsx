@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { STATUSES, statusById } from '../data/statuses'
 
 function formatDate(d) {
@@ -17,11 +17,23 @@ export default function ApplicationsTable({
   title = 'Daftar lamaran',
 }) {
   const [openMenuId, setOpenMenuId] = useState(null)
+  const tableRef = useRef(null)
   const tabs = [{ id: 'all', label: 'Semua' }, ...statuses.map((s) => ({ id: s.id, label: s.label }))]
   const shown = statusFilter === 'all' ? jobs : jobs.filter((j) => j.status === statusFilter)
 
+  useEffect(() => {
+    if (openMenuId === null) return
+    function handleClickOutside(e) {
+      if (tableRef.current && !tableRef.current.contains(e.target)) {
+        setOpenMenuId(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openMenuId])
+
   return (
-    <div className="bg-white rounded-2xl border border-surface-border shadow-card overflow-hidden">
+    <div ref={tableRef} className="bg-white rounded-2xl border border-surface-border shadow-card overflow-hidden">
       <div className="flex items-center justify-between px-5 pt-4 flex-wrap gap-3">
         <h2 className="font-semibold text-ink">{title}</h2>
       </div>
