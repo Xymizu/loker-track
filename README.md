@@ -1,19 +1,34 @@
 # LokerTrack
 
-Dashboard untuk melacak lamaran kerja — dari status *wishlist*, *applied*, *screening*, *interview*, *offer*, sampai *closed*. Menampilkan ringkasan statistik, grafik, dan tabel lamaran yang bisa dicari dan difilter per status.
+Dashboard untuk melacak lamaran kerja dari status *wishlist*, *applied*, *screening*, *interview*, *offer*, sampai *closed*. Menampilkan ringkasan statistik, grafik, dan tabel lamaran yang bisa dicari dan difilter per status.
 
 Project ini adalah **monorepo** berisi dua bagian:
 
 | Folder                 | Deskripsi                                                |
 |-------------------------|-----------------------------------------------------------|
 | `loker-track/`          | Frontend — React + Vite + Tailwind CSS, React Router, React Query |
-| `loker-track-backend/`  | Backend — REST API dengan Express, siap pakai in-memory store atau MySQL |
+| `loker-track-backend/`  | Backend — REST API dengan Express|
 
 ## Prasyarat
 
 - [Node.js](https://nodejs.org/) v18 ke atas
 - npm (sudah termasuk saat install Node.js)
-- (Opsional) MySQL, hanya diperlukan kalau mau pakai database sungguhan — tanpa ini pun aplikasi tetap bisa jalan dengan data sementara (in-memory)
+
+## Menjalankan dari Root
+
+```bash
+npm install
+```
+
+Lalu jalankan backend dan frontend di terminal terpisah:
+
+```bash
+npm run dev:be
+```
+
+```bash
+npm run dev:fe
+```
 
 ## Menjalankan Backend
 
@@ -24,11 +39,11 @@ cp .env.example .env
 npm run dev
 ```
 
-Backend akan jalan di `http://localhost:4000`. Cek `http://localhost:4000/health` di browser — kalau muncul `{"status":"ok"}`, backend sudah aktif.
+Backend akan jalan di `http://localhost:4000`. Cek `http://localhost:4000/health` di browser  kalau muncul `{"status":"ok"}`, backend sudah aktif.
 
 Secara default backend jalan pakai **in-memory store** (`DATA_SOURCE=memory` di `.env`), jadi bisa langsung dicoba tanpa setup database. Data akan direset setiap backend di-restart.
 
-### (Opsional) Pakai database MySQL beneran
+### (Opsional) Pakai database MySQL
 
 1. Import struktur tabel yang sudah disiapkan:
    ```bash
@@ -57,16 +72,14 @@ Frontend akan jalan di `http://localhost:5173`. Buka URL tersebut di browser.
 ## Ringkasan Menjalankan Semuanya
 
 ```bash
-# Terminal 1 — backend
-cd loker-track-backend
+# Root monorepo
 npm install
-cp .env.example .env
-npm run dev
+
+# Terminal 1 — backend
+npm run dev:be
 
 # Terminal 2 — frontend
-cd loker-track
-npm install
-npm run dev
+npm run dev:fe
 ```
 
 Lalu buka `http://localhost:5173`.

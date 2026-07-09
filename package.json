@@ -1,0 +1,16 @@
+{
+  "name": "loker-track-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "loker-track",
+    "loker-track-backend"
+  ],
+  "scripts": {
+    "dev:fe": "npm run dev --workspace loker-track",
+    "build:fe": "npm run build --workspace loker-track",
+    "preview:fe": "npm run preview --workspace loker-track",
+    "dev:be": "npm run dev --workspace loker-track-backend",
+    "start:be": "npm run start --workspace loker-track-backend"
+  }
+}
